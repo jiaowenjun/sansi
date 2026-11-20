@@ -1,0 +1,4 @@
+interface:
+  display_name: "三思"
+  short_description: "按任务难度动态分配思考与验证预算，简单直答，复杂任务主动深思"
+  default_prompt: "使用 $sansi 按任务难度分配思考与验证预算，完成当前任务。"

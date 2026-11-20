@@ -1,14 +1,32 @@
-# Adaptive Deliberation：自适应审慎思考研究
+# 三思（sansi）
 
-通过自适应推理预算（Adaptive Test-Time Compute Allocation）提高 AI Agent 任务准确率的研究项目：根据任务复杂度、错误风险和推理中的不确定性，动态决定思考深度、推理次数与验证轮数。
+用额外的任务级思考、替代路径和验证弥补模型智能的不足：简单任务不浪费计算，复杂、不确定或高代价任务主动增加思考深度。
 
-**核心闭环**：`任务评估 → 初始预算分配 → 执行与观察 → 必要时增加预算 → 独立复核 → 收敛停止`
+**核心理念：** 三思而后行，按需思考。
+
+**三思协议：** `思前评估 → 思中观察与追加 → 思后挑战、验证与停止`
+
+“三思”不是机械地重复三次。Skill 会选择最低充分深度：简单请求直接完成；出现多步依赖、证据冲突、重要取舍或高失败代价时，才增加替代路径、复核和外部验证。
+
+## 使用
+
+Skill 名称为 `sansi`，可显式使用 `$sansi`。显式调用启用按需路由，不会强制最高深度，也不会扩大模型、工具或外部操作权限。
+
+```text
+使用 $sansi 评审这个迁移方案，重点检查回滚和数据一致性。
+```
 
 ## 目录结构
 
 ```
 sansi/
-├── docs/                  # 调研报告（入库）
+├── SKILL.md               # Skill 入口：深度路由、三思协议和停止条件
+├── agents/openai.yaml     # Codex 界面元数据
+├── references/
+│   └── verification.md   # 按任务类型选择验证方法
+├── evals/
+│   └── cases.yaml         # 行为评测场景与不变量
+├── docs/                  # 调研与证据底稿
 │   ├── research_review.md # 论文综述：自适应推理预算方向 8 篇代表性论文
 │   ├── skill_review_v1.md # Skill 调研（一）：unlazy / cc-thinking-skills 等 5 个候选，精选 3 个
 │   ├── skill_review_v2.md # Skill 调研（二）：三思而后行——Reasoning Workflow / Deep Research / Self-Refine
@@ -26,9 +44,20 @@ sansi/
 | [skill_review_v2.md](docs/skill_review_v2.md) | 「三思而后行」理念调研：自适应思考深度分级、预算分配与迭代收敛停止机制 |
 | [local_reference_summary.md](docs/local_reference_summary.md) | 8 篇本地 PDF 与 5 个参考仓库的版本快照、逐项证据、源码边界、测试结果和设计映射 |
 
-## 下一步
+## 设计边界
 
-基于四份文档，将各项目核心机制整合为一个独立的 **Adaptive Deliberation Skill**（不简单叠加使用），用于 Codex、Claude Code、Cursor 等支持 Agent Skills 的工具。首版应只承诺任务级流程控制；模型内部预算、并行采样和全局资源调度由 Runtime 实现，并通过目标域 Benchmark 证明效果。
+- Skill 控制可观察的任务流程，不声称能测量或保证模型内部推理 Token。
+- 每轮追加投入必须解决明确缺口；没有新证据或实质修正时及时停止。
+- 验证强度与风险相称，优先测试、原始来源和独立证据，不以模型自评代替事实。
+- 多 Agent、额外模型调用和更高 reasoning effort 仅在宿主支持、权限允许且收益值得时使用。
+
+## 验证
+
+使用 Skill Creator 的校验器检查目录、名称、frontmatter 和脚手架残留：
+
+```bash
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" .
+```
 
 ## 本地资料说明
 
