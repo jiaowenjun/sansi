@@ -5,7 +5,8 @@
 > **调研日期**：2026-11-20  
 > **筛选数量**：3 个代表性 Skill  
 > **目标平台**：Codex、Claude Code、Cursor、GitHub Copilot 等支持 Agent Skills 的工具  
-> **核心目标**：为开发通用的 Adaptive Deliberation（自适应审慎思考）Skill 提供工程参考
+> **核心目标**：为开发通用的 Adaptive Deliberation（自适应审慎思考）Skill 提供工程参考<br>
+> **源码复核版**：本地仓库快照、测试结果与证据边界见[本地资料汇总](local_reference_summary.md)
 
 ---
 
@@ -57,6 +58,8 @@ Stars 仅作为社区关注度的参考，不代表实际准确率或工程质�
 - [Thomaszhou22/self-refine-skill](https://github.com/Thomaszhou22/self-refine-skill)
 
 选择第三个项目时，虽然其 Stars 明显较少，但它与「通过增加思考轮数提高答案质量」这一目标高度吻合，因此在相关性优先的筛选策略下仍然入选。
+
+本次源码结论固定到 `unlazy@1667149`、`cc-thinking-skills@7b8fece` 和 `self-refine-skill@620cb9b`。Stars 是调研日页面快照，不参与源码能力或效果证据判断。
 
 ---
 
@@ -278,6 +281,8 @@ unlazy/
 └── tests/
 ```
 
+本地执行 `npm test` 时，主要测试套件 34/34、27/27、51/51、24/24、29/29、8/8 均通过，自检 15/15 通过。这证明 Gate 解析、授权与证据绑定、租约调度和 Stop Hook 符合仓库定义的软件契约；它不等于“模型思考能力”或通用任务准确率已经提升。
+
 其中最值得研究的组件：
 
 **1. gate-check.mjs**
@@ -442,7 +447,7 @@ Hook 不负责重新执行验证，而是根据结构化状态判断是否允许
 
 ## 3.2 核心实现逻辑
 
-### 3.2.1 28 个独立思维模型
+### 3.2.1 28 个 active Skill
 
 项目将不同领域的思维方法封装为独立 Skill。
 
@@ -677,10 +682,12 @@ scripts/
 - 证据登记。
 - 实验报告。
 
-目前项目的公开审计指出：
+本地 `validate-skills.js` 显示 28/28 个 active Skill 结构通过，structural eval 通过。这里的 28 个条目包含 router 和 combination，不能全部称为相互独立的思维模型。
 
-- 28 个 Skill 均为手动触发。
-- 没有获得自动保留的最终评测结论。
+当前证据审计指出：
+
+- 28 个 active Skill 全部处于 `manual-only quarantine`。
+- 自动确认提升的 Skill 数量为 0。
 - `thinking-scientific-method` 有一个初步 +4.0 个百分点的实验结果。
 - 该结果低于项目预设的 +5 个百分点效用门槛，且存在证据缺口。
 
@@ -1046,11 +1053,12 @@ Skill 声称 Zero API Cost，准确理解应当是没有额外的外部 API 或�
 
 实验设置：
 
-- 20 道测试题。
+- 20 道合成测试题。
 - 5 个任务类别。
 - 使用同一模型比较单次生成与 Self-Refine。
 - 六个评价维度。
 - 使用 1–10 分的加权评分。
+- 单次运行，没有多随机种子复现。
 
 论文报告：
 
@@ -1076,7 +1084,7 @@ Skill 声称 Zero API Cost，准确理解应当是没有额外的外部 API 或�
 
 但必须注意实验局限：
 
-1. 只有 20 道题。
+1. 只有 20 道合成题。
 2. 测试集主要是开发者常见任务。
 3. 生成与评价使用同一模型。
 4. 评分具有一定主观性。
@@ -1708,4 +1716,4 @@ Cost per Success
 
 ---
 
-*调研说明：GitHub Stars 为调研时公开页面显示的近似值，会随时间变化。项目自身的 Benchmark、效果声明和设计理念均作为项目方提供的证据处理，不等同于独立学术验证。*
+*调研说明：GitHub Stars 为调研时公开页面显示的近似值，会随时间变化。项目自身的 Benchmark、效果声明和设计理念均作为项目方提供的证据处理，不等同于独立学术验证。源码版本、复跑结果及 Prompt/Runtime/验证分层见[本地资料汇总](local_reference_summary.md)。*

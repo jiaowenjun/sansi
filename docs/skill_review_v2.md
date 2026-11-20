@@ -2,7 +2,8 @@
 
 > **调研日期：** 2026-11-20  
 > **筛选原则：** 仅按与「三思而后行」和「按需思考」的理念相关性排序，不考虑 Stars、下载量和社区热度。  
-> **核心目标：** 根据任务复杂度、风险和不确定性，决定初始推理投入；在执行中动态调整；达到足够质量后及时停止。
+> **核心目标：** 根据任务复杂度、风险和不确定性，决定初始推理投入；在执行中动态调整；达到足够质量后及时停止。<br>
+> **源码复核版：** `Reasoning Workflow 3.2.0`、`Deep Research 1.13.0` 与 Self-Refine 的完整证据见[本地资料汇总](local_reference_summary.md)
 
 ## 一、调研结论
 
@@ -33,6 +34,8 @@
 **项目：** [Agent--deep-research-Workflow-Skills](https://github.com/zy839971925-zyy/Agent--deep-research-Workflow-Skills)
 
 **核心 Skill：** [reasoning-workflow/SKILL.md](https://github.com/zy839971925-zyy/Agent--deep-research-Workflow-Skills/blob/main/skills/reasoning-workflow/SKILL.md)
+
+本地核查固定到提交 `c4de05d`。仓库不只有 Prompt：还包含 task profile、routing、runtime、host adapter、事件/状态 Schema 和交付验证脚本。本地 `python3 tests/run_all.py` 通过 82 项测试；但 `RELEASE.json` 同时明确记录 `model_compliance_evaluated=false`、`remote_published=false`。因此这些测试证明软件契约可执行，不证明真实模型会稳定遵守五级深度，也不证明任务质量提升。
 
 这是三个项目中最接近「让 Agent 根据任务难度决定思考深度」这一目标的方案。
 
@@ -193,6 +196,8 @@ depth_profiles:
 **项目：** [moonlight-lupin/agent-skills](https://github.com/moonlight-lupin/agent-skills)
 
 **核心 Skill：** [research/deep-research/SKILL.md](https://github.com/moonlight-lupin/agent-skills/blob/main/research/deep-research/SKILL.md)
+
+本地核查固定到 `moonlight-agent-skills@e943e32` 的 Deep Research 1.13.0。当前源码已经包含 evidence store、quote anchoring、claim/citation/report gates、反证检查和 source-bias 检查；5 个以上来源的报告要求通过三个 deterministic gate，不应再概括为只有搜索轮数和停止 Prompt。测试入口本次因环境缺少 `pytest` 而未运行，错误为 `ModuleNotFoundError: No module named 'pytest'`。
 
 这个 Skill 专门面向深度调研任务，但其预算分配和停止机制具有很强的通用参考价值。
 
@@ -566,7 +571,7 @@ critique:
 
 ## 4.7 项目自测结果的可信度
 
-Self-Refine 项目提供了一份 20 道题、五类任务的自测报告，报告声称整体评分提升约 21.2%。
+Self-Refine 项目提供了一份 20 道合成题、五类任务、单次运行的自测报告，报告声称整体评分提升约 21.2%。生成与评分由同一模型完成。
 
 但这不能直接当作普遍有效的实验结论：
 
@@ -574,6 +579,7 @@ Self-Refine 项目提供了一份 20 道题、五类任务的自测报告，报�
 - 主要由同类模型生成和评价；
 - 评价标准具有一定主观性；
 - 缺乏充分的消融实验；
+- 没有多随机种子重复、置信区间或延迟测量；
 - 没有证明所有任务类型都能获得相同收益。
 
 因此，我认为它的**流程设计有参考价值，但其量化提升幅度不应直接用于预估实际收益**。
@@ -1155,3 +1161,7 @@ Never claim certainty when important uncertainty remains.
 
 8. [Self-Refine: Iterative Refinement with Self-Feedback (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651)
 9. [Reflexion: Language Agents with Verbal Reinforcement Learning (Shinn et al., 2023)](https://arxiv.org/abs/2303.11366)
+
+---
+
+*源码说明：本报告的设计评价与效果证据分开处理。结构化 Gate、Schema 和测试可以约束工作流，但不能单独证明来源真实、模型遵循或准确率提升；完整版本快照和复跑记录见[本地资料汇总](local_reference_summary.md)。*
