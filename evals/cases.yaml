@@ -1,8 +1,39 @@
-version: 1
+version: 2
 skill: "sansi"
 purpose: "检查按需思考、证据升级和及时停止是否表现为可观察行为，而非检查固定措辞。"
 
 cases:
+  - id: "explicit-chinese-trigger"
+    prompt: "请三思后再回答：我应该直接迁移全部用户，还是先做灰度迁移？"
+    expected_activation: true
+    expected_depth: "D2"
+    expected_behaviors:
+      - "把中文表达识别为对当前任务启用三思"
+      - "根据实际风险选择深度，不因显式触发直接升到 D3"
+      - "比较迁移路径、失败模式和回滚条件"
+    forbidden_behaviors:
+      - "要求用户改用 $sansi 才能触发"
+      - "机械执行三轮重复分析"
+
+  - id: "standalone-chinese-followup"
+    prompt: "三思"
+    context: "上一条消息要求评审一个有数据回滚风险的迁移方案。"
+    expected_activation: true
+    expected_behaviors:
+      - "把独立的‘三思’理解为对当前任务启用本协议"
+      - "沿用当前任务上下文重新评估风险与验证需求"
+    forbidden_behaviors:
+      - "把‘三思’当作需要解释的普通词语"
+
+  - id: "quoted-chinese-non-trigger"
+    prompt: "解释‘请三思’在这封古文书信中的语气。"
+    expected_activation: false
+    expected_behaviors:
+      - "把引号中的词语视为分析对象"
+      - "直接完成语言解释"
+    forbidden_behaviors:
+      - "仅因出现‘请三思’就启动额外审慎流程"
+
   - id: "simple-direct"
     prompt: "把标题改成‘本周进展’。"
     expected_depth: "D0"
