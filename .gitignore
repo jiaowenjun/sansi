@@ -1,0 +1,6 @@
+# 本地研究资料（体积大，不入库）
+papers/
+reference-skills/
+
+# macOS
+.DS_Store
